@@ -8,12 +8,21 @@ Thème GRUB sombre avec fond personnalisé, icônes et menu graphique pour un po
 - `background-grub-signal-skeleton.png` : squelette ASCII avec halo d’éclipse et signaux néon, utilisé par le thème actuel.
 - `icons/fedora.png` : icône Fedora F en ASCII glitch sombre, dans le style de l’icône Windows.
 - `icons/windows.png` : icône Windows en ASCII glitch sur fond transparent.
+- `install.sh` : installation vérifiée et sauvegardée sur Fedora.
 
 Le thème ne modifie pas les entrées de démarrage. Fedora et Windows doivent déjà être détectés et présents dans le `grub.cfg` généré par la machine. GRUB associe les icônes aux classes des entrées de menu.
 
 ## Installation sur Fedora
 
-Copier le dossier du thème vers `/boot/grub2/themes/grub-theme/`, puis définir dans `/etc/default/grub` :
+Depuis ce dossier cloné sur Fedora, lancer :
+
+```bash
+sudo bash ./install.sh
+```
+
+Le script sauvegarde la configuration actuelle, installe le thème avec des permissions strictes, détecte BIOS/UEFI, régénère `grub.cfg` et vérifie les fichiers. Il ne redémarre pas la machine.
+
+La configuration finale dans `/etc/default/grub` est :
 
 ```ini
 GRUB_GFXMODE=auto
