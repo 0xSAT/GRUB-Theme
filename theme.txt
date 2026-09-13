@@ -27,6 +27,7 @@ terminal-border: "0"
     item_height = 68
     item_padding = 10
     item_spacing = 10
+    menu_pixmap_style = "menu_*.png"
 }
 
 + label {

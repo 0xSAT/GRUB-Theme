@@ -6,6 +6,7 @@ Thème GRUB sombre avec fond personnalisé, icônes et menu graphique pour un po
 
 - `theme.txt` : mise en page du menu graphique GRUB.
 - `background-grub-signal-skeleton.png` : squelette ASCII avec halo d’éclipse et signaux néon, utilisé par le thème actuel.
+- `menu_*.png` : neuf tranches du panneau verre fumé derrière le menu.
 - `icons/fedora.png` : icône Fedora F en ASCII glitch sombre, dans le style de l’icône Windows.
 - `icons/windows.png` : icône Windows en ASCII glitch sur fond transparent.
 - `install.sh` : installation vérifiée et sauvegardée sur Fedora.

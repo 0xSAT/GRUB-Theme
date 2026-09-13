@@ -6,6 +6,7 @@ repo="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 theme=/boot/grub2/themes/grub-theme
 backup="/var/backups/grub-theme-$(date +%Y%m%d-%H%M%S)"
 defaults=/etc/default/grub
+panels=(nw n ne w c e sw s se)
 
 die() { printf '[ERROR] %s\n' "$*" >&2; exit 1; }
 warn() { printf '[WARN] %s\n' "$*" >&2; }
@@ -23,6 +24,11 @@ for path in \
     [[ -f $path && ! -L $path ]] || die "Fichier manquant ou lien symbolique : $path"
 done
 
+for panel in "${panels[@]}"; do
+    path="$repo/menu_${panel}.png"
+    [[ -f $path && ! -L $path ]] || die "Tranche de panneau manquante : $path"
+done
+
 extra="$(find "$repo/icons" -maxdepth 1 -type f ! -name fedora.png ! -name windows.png -print -quit)"
 [[ -z $extra ]] || die "Icône supplémentaire trouvée : $extra"
 
@@ -30,6 +36,11 @@ for image in \
     "$repo/background-grub-signal-skeleton.png" \
     "$repo/icons/fedora.png" \
     "$repo/icons/windows.png"; do
+    [[ "$(file -b --mime-type "$image")" == image/png ]] || die "PNG invalide : $image"
+done
+
+for panel in "${panels[@]}"; do
+    image="$repo/menu_${panel}.png"
     [[ "$(file -b --mime-type "$image")" == image/png ]] || die "PNG invalide : $image"
 done
 
@@ -46,6 +57,7 @@ trap '[[ -z "${stage}" ]] || rm -rf -- "${stage}"' EXIT
 install -d -o root -g root -m 0755 "$stage/icons"
 install -o root -g root -m 0644 "$repo/theme.txt" "$repo/background-grub-signal-skeleton.png" "$stage/"
 install -o root -g root -m 0644 "$repo/icons/fedora.png" "$repo/icons/windows.png" "$stage/icons/"
+install -o root -g root -m 0644 "$repo"/menu_*.png "$stage/"
 
 [[ ! -L $theme ]] || die "Refus de remplacer le lien symbolique : $theme"
 [[ ! -e $theme ]] || mv -- "$theme" "$backup/theme"
@@ -77,6 +89,11 @@ for path in \
     "$theme/background-grub-signal-skeleton.png" \
     "$theme/icons/fedora.png" \
     "$theme/icons/windows.png"; do
+    [[ "$(stat -c '%U:%G:%a' "$path")" == root:root:644 ]] || die "Permissions incorrectes : $path"
+done
+
+for panel in "${panels[@]}"; do
+    path="$theme/menu_${panel}.png"
     [[ "$(stat -c '%U:%G:%a' "$path")" == root:root:644 ]] || die "Permissions incorrectes : $path"
 done
 
