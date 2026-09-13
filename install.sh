@@ -80,9 +80,14 @@ for path in \
     [[ "$(stat -c '%U:%G:%a' "$path")" == root:root:644 ]] || die "Permissions incorrectes : $path"
 done
 
-grep -Eq -- '--class(=|[[:space:]])fedora([[:space:]]|$)' /boot/grub2/grub.cfg \
-    || warn 'Classe fedora absente : son icône pourrait ne pas apparaître'
-grep -Eq -- '--class(=|[[:space:]])windows([[:space:]]|$)' /boot/grub2/grub.cfg \
-    || warn 'Classe windows absente : son icône pourrait ne pas apparaître'
+has_class() {
+    local class=$1
+    grep -Eq -- "--class(=|[[:space:]])${class}([[:space:]]|$)" /boot/grub2/grub.cfg 2>/dev/null \
+        || grep -R -Eq -- "^grub_class[[:space:]]+${class}([[:space:]]|$)" \
+            /boot/loader/entries /boot/efi/loader/entries 2>/dev/null
+}
+
+has_class fedora || warn 'Classe fedora absente : son icône pourrait ne pas apparaître'
+has_class windows || warn 'Classe windows absente : son icône pourrait ne pas apparaître'
 
 printf '[INFO] Thème installé. Sauvegarde : %s\n[INFO] Aucun redémarrage effectué.\n' "$backup"
