@@ -1,0 +1,85 @@
+# Original spatial HUD. The installed machine supplies all boot entries.
+title-text: ""
+desktop-image: "background.png"
+desktop-image-scale-method: "stretch"
+desktop-color: "#03090E"
+terminal-font: "Unifont Regular 16"
+terminal-left: "5%"
+terminal-top: "5%"
+terminal-width: "90%"
+terminal-height: "90%"
+
++ label {
+    left = 7%
+    top = 19%
+    width = 53%
+    font = "Unifont Regular 16"
+    color = "#BCEEFF"
+    text = "// VOID TERMINAL"
+}
+
++ label {
+    left = 7%
+    top = 25%
+    width = 53%
+    font = "Unifont Regular 16"
+    color = "#7FA0B2"
+    text = "BOOT SEQUENCE / SELECT SYSTEM"
+}
+
++ boot_menu {
+    left = 7%
+    top = 34%
+    width = 53%
+    height = 38%
+    item_font = "Unifont Regular 16"
+    item_color = "#93AAB9"
+    selected_item_color = "#F0FCFF"
+    selected_item_pixmap_style = "select_*.png"
+    icon_width = 32
+    icon_height = 32
+    item_icon_space = 12
+    item_height = 42
+    item_padding = 8
+    item_spacing = 6
+}
+
++ label {
+    left = 7%
+    top = 76%
+    width = 53%
+    font = "Unifont Regular 16"
+    color = "#7FA0B2"
+    text = "AUTO-BOOT"
+}
+
++ progress_bar {
+    id = "__timeout__"
+    left = 7%
+    top = 81%
+    width = 53%
+    height = 5
+    show_text = false
+    fg_color = "#82DFFF"
+    bg_color = "#14232E"
+    border_color = "#14232E"
+}
+
++ label {
+    id = "__timeout__"
+    left = 7%
+    top = 85%
+    width = 86%
+    font = "Unifont Regular 16"
+    color = "#93AAB9"
+    text = "@TIMEOUT_NOTIFICATION_LONG@"
+}
+
++ label {
+    left = 7%
+    top = 92%
+    width = 86%
+    font = "Unifont Regular 16"
+    color = "#93AAB9"
+    text = "[UP/DOWN] SELECT   [ENTER] BOOT   [E] EDIT   [C] CONSOLE"
+}

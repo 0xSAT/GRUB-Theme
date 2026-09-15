@@ -3,60 +3,70 @@ set -Eeuo pipefail
 umask 022
 
 repo="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-theme=/boot/grub2/themes/grub-theme
-backup="/var/backups/grub-theme-$(date +%Y%m%d-%H%M%S)"
 defaults=/etc/default/grub
 panels=(nw n ne w c e sw s se)
 
 die() { printf '[ERROR] %s\n' "$*" >&2; exit 1; }
 warn() { printf '[WARN] %s\n' "$*" >&2; }
 
-[[ $EUID -eq 0 ]] || die 'Lance avec : sudo bash ./install.sh'
-command -v grub2-mkconfig >/dev/null || die 'grub2-mkconfig absent : installe grub2-tools'
-command -v grub2-script-check >/dev/null || die 'grub2-script-check absent : installe grub2-tools'
+check_only=false
+if [[ ${1:-} == --check ]]; then
+    check_only=true
+    shift
+fi
+[[ $# -le 1 ]] || die 'Usage : bash ./install.sh [--check] [skeleton|void-terminal]'
+variant=${1:-skeleton}
+case "$variant" in
+    skeleton)
+        source_dir=$repo
+        theme=/boot/grub2/themes/grub-theme
+        background=background-grub-signal-skeleton.png
+        sprites=()
+        for panel in "${panels[@]}"; do
+            sprites+=("menu_${panel}.png" "select_${panel}.png")
+        done
+        ;;
+    void-terminal)
+        source_dir="$repo/themes/void-terminal"
+        theme=/boot/grub2/themes/void-terminal
+        background=background.png
+        sprites=(select_w.png select_c.png select_e.png)
+        ;;
+    *) die "Thème inconnu : $variant (skeleton ou void-terminal)" ;;
+esac
+assets=(theme.txt "$background" "${sprites[@]}")
+
 command -v file >/dev/null || die 'file absent : installe le paquet file'
 
-for path in \
-    "$repo/theme.txt" \
-    "$repo/background-grub-signal-skeleton.png" \
-    "$repo/icons/fedora.png" \
-    "$repo/icons/windows.png"; do
+for asset in "${assets[@]}"; do
+    path="$source_dir/$asset"
     [[ -f $path && ! -L $path ]] || die "Fichier manquant ou lien symbolique : $path"
+    if [[ $asset == *.png ]]; then
+        [[ "$(file -b --mime-type "$path")" == image/png ]] || die "PNG invalide : $path"
+    fi
 done
 
-for panel in "${panels[@]}"; do
-    path="$repo/menu_${panel}.png"
-    [[ -f $path && ! -L $path ]] || die "Tranche de panneau manquante : $path"
-done
-
-for panel in "${panels[@]}"; do
-    path="$repo/select_${panel}.png"
-    [[ -f $path && ! -L $path ]] || die "Tranche de sélection manquante : $path"
+for path in "$repo/icons/fedora.png" "$repo/icons/windows.png"; do
+    [[ -f $path && ! -L $path ]] || die "Fichier manquant ou lien symbolique : $path"
+    [[ "$(file -b --mime-type "$path")" == image/png ]] || die "PNG invalide : $path"
 done
 
 extra="$(find "$repo/icons" -maxdepth 1 -type f ! -name fedora.png ! -name windows.png -print -quit)"
 [[ -z $extra ]] || die "Icône supplémentaire trouvée : $extra"
 
-for image in \
-    "$repo/background-grub-signal-skeleton.png" \
-    "$repo/icons/fedora.png" \
-    "$repo/icons/windows.png"; do
-    [[ "$(file -b --mime-type "$image")" == image/png ]] || die "PNG invalide : $image"
-done
-
-for panel in "${panels[@]}"; do
-    image="$repo/menu_${panel}.png"
-    [[ "$(file -b --mime-type "$image")" == image/png ]] || die "PNG invalide : $image"
-done
-
-for panel in "${panels[@]}"; do
-    image="$repo/select_${panel}.png"
-    [[ "$(file -b --mime-type "$image")" == image/png ]] || die "PNG invalide : $image"
-done
-
-grep -Fq 'desktop-image: "background-grub-signal-skeleton.png"' "$repo/theme.txt" \
+grep -Fxq "desktop-image: \"$background\"" "$source_dir/theme.txt" \
     || die 'theme.txt ne référence pas le fond attendu'
+if "$check_only"; then
+    printf '[INFO] Fichiers vérifiés : %s (aucune installation effectuée).\n' "$variant"
+    exit 0
+fi
+
+[[ $EUID -eq 0 ]] || die 'Lance avec : sudo bash ./install.sh [skeleton|void-terminal]'
+command -v grub2-mkconfig >/dev/null || die 'grub2-mkconfig absent : installe grub2-tools'
+command -v grub2-script-check >/dev/null || die 'grub2-script-check absent : installe grub2-tools'
 [[ -f $defaults ]] || die "$defaults introuvable"
+install -d -o root -g root -m 0755 /var/backups
+backup="$(mktemp -d /var/backups/grub-theme-$(date +%Y%m%d-%H%M%S)-XXXXXX)"
 
 install -d -o root -g root -m 0755 /boot/grub2/themes "$backup"
 install -o root -g root -m 0600 "$defaults" "$backup/grub-defaults"
@@ -65,10 +75,10 @@ install -o root -g root -m 0600 "$defaults" "$backup/grub-defaults"
 stage="$(mktemp -d /boot/grub2/themes/.grub-theme.XXXXXX)"
 trap '[[ -z "${stage}" ]] || rm -rf -- "${stage}"' EXIT
 install -d -o root -g root -m 0755 "$stage/icons"
-install -o root -g root -m 0644 "$repo/theme.txt" "$repo/background-grub-signal-skeleton.png" "$stage/"
+for asset in "${assets[@]}"; do
+    install -o root -g root -m 0644 "$source_dir/$asset" "$stage/"
+done
 install -o root -g root -m 0644 "$repo/icons/fedora.png" "$repo/icons/windows.png" "$stage/icons/"
-install -o root -g root -m 0644 "$repo"/menu_*.png "$stage/"
-install -o root -g root -m 0644 "$repo"/select_*.png "$stage/"
 
 [[ ! -L $theme ]] || die "Refus de remplacer le lien symbolique : $theme"
 [[ ! -e $theme ]] || mv -- "$theme" "$backup/theme"
@@ -95,21 +105,8 @@ fi
 grub2-mkconfig -o "$grub_cfg"
 grub2-script-check /boot/grub2/grub.cfg
 
-for path in \
-    "$theme/theme.txt" \
-    "$theme/background-grub-signal-skeleton.png" \
-    "$theme/icons/fedora.png" \
-    "$theme/icons/windows.png"; do
-    [[ "$(stat -c '%U:%G:%a' "$path")" == root:root:644 ]] || die "Permissions incorrectes : $path"
-done
-
-for panel in "${panels[@]}"; do
-    path="$theme/menu_${panel}.png"
-    [[ "$(stat -c '%U:%G:%a' "$path")" == root:root:644 ]] || die "Permissions incorrectes : $path"
-done
-
-for panel in "${panels[@]}"; do
-    path="$theme/select_${panel}.png"
+for asset in "${assets[@]}" icons/fedora.png icons/windows.png; do
+    path="$theme/$asset"
     [[ "$(stat -c '%U:%G:%a' "$path")" == root:root:644 ]] || die "Permissions incorrectes : $path"
 done
 
