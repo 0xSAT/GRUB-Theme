@@ -20,7 +20,9 @@ terminal-border: "0"
 
     item_font = "Unifont Regular 16"
     item_color = "#B8C2D6"
+    selected_item_font = "Unifont Regular 16"
     selected_item_color = "#FFFFFF"
+    selected_item_pixmap_style = "select_*.png"
     icon_width = 56
     icon_height = 56
     item_icon_space = 18

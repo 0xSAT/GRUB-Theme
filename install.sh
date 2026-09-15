@@ -29,6 +29,11 @@ for panel in "${panels[@]}"; do
     [[ -f $path && ! -L $path ]] || die "Tranche de panneau manquante : $path"
 done
 
+for panel in "${panels[@]}"; do
+    path="$repo/select_${panel}.png"
+    [[ -f $path && ! -L $path ]] || die "Tranche de sélection manquante : $path"
+done
+
 extra="$(find "$repo/icons" -maxdepth 1 -type f ! -name fedora.png ! -name windows.png -print -quit)"
 [[ -z $extra ]] || die "Icône supplémentaire trouvée : $extra"
 
@@ -41,6 +46,11 @@ done
 
 for panel in "${panels[@]}"; do
     image="$repo/menu_${panel}.png"
+    [[ "$(file -b --mime-type "$image")" == image/png ]] || die "PNG invalide : $image"
+done
+
+for panel in "${panels[@]}"; do
+    image="$repo/select_${panel}.png"
     [[ "$(file -b --mime-type "$image")" == image/png ]] || die "PNG invalide : $image"
 done
 
@@ -58,6 +68,7 @@ install -d -o root -g root -m 0755 "$stage/icons"
 install -o root -g root -m 0644 "$repo/theme.txt" "$repo/background-grub-signal-skeleton.png" "$stage/"
 install -o root -g root -m 0644 "$repo/icons/fedora.png" "$repo/icons/windows.png" "$stage/icons/"
 install -o root -g root -m 0644 "$repo"/menu_*.png "$stage/"
+install -o root -g root -m 0644 "$repo"/select_*.png "$stage/"
 
 [[ ! -L $theme ]] || die "Refus de remplacer le lien symbolique : $theme"
 [[ ! -e $theme ]] || mv -- "$theme" "$backup/theme"
@@ -94,6 +105,11 @@ done
 
 for panel in "${panels[@]}"; do
     path="$theme/menu_${panel}.png"
+    [[ "$(stat -c '%U:%G:%a' "$path")" == root:root:644 ]] || die "Permissions incorrectes : $path"
+done
+
+for panel in "${panels[@]}"; do
+    path="$theme/select_${panel}.png"
     [[ "$(stat -c '%U:%G:%a' "$path")" == root:root:644 ]] || die "Permissions incorrectes : $path"
 done
 
