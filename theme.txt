@@ -13,51 +13,60 @@ terminal-height: "100%"
 terminal-border: "0"
 
 + boot_menu {
-    left = 24%
-    top = 30%
-    width = 52%
-    height = 42%
+    left = 10%
+    top = 31%
+    width = 58%
+    height = 43%
 
-    item_font = "Unifont Regular 16"
-    item_color = "#B8C2D6"
-    selected_item_font = "Unifont Regular 16"
-    selected_item_color = "#FFFFFF"
+    item_font = "Unifont Regular 14"
+    item_color = "#6E86A0"
+    selected_item_font = "Unifont Regular 14"
+    selected_item_color = "#DEF0FF"
     selected_item_pixmap_style = "select_*.png"
-    icon_width = 56
-    icon_height = 56
-    item_icon_space = 18
+    icon_width = 52
+    icon_height = 52
+    item_icon_space = 16
     item_height = 68
-    item_padding = 10
-    item_spacing = 10
+    item_padding = 12
+    item_spacing = 8
     menu_pixmap_style = "menu_*.png"
 }
 
 + label {
-    left = 24%
-    top = 18%
-    width = 52%
-    align = "center"
-    color = "#EAF1FF"
-    text = "SELECT OPERATING SYSTEM"
+    left = 10%
+    top = 21%
+    width = 58%
+    align = "left"
+    color = "#8CE1FF"
+    text = "SYSTEM SELECT // DUAL BOOT"
 }
 
 + progress_bar {
     id = "__timeout__"
-    left = 30%
-    top = 86%
-    width = 40%
-    height = 4
-    fg_color = "#63A8FF"
-    bg_color = "#263044"
+    left = 10%
+    top = 82%
+    width = 58%
+    height = 6
+    fg_color = "#23AAFF"
+    bg_color = "#142639"
     border_color = "#263044"
 }
 
 + label {
     id = "__timeout__"
-    left = 30%
-    top = 89%
-    width = 40%
-    align = "center"
-    color = "#9CAAC2"
+    left = 10%
+    top = 85%
+    width = 58%
+    align = "left"
+    color = "#6E86A0"
     text = "@TIMEOUT_NOTIFICATION_LONG@"
+}
+
++ label {
+    left = 10%
+    top = 91%
+    width = 58%
+    align = "left"
+    color = "#4A5E78"
+    text = "[↑/↓] SELECT   [ENTER] BOOT   [E] EDIT   [C] CONSOLE"
 }

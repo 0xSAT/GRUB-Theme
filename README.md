@@ -35,4 +35,4 @@ Regénérer ensuite la configuration GRUB avec la commande adaptée à l’insta
 
 ## État
 
-Version visuelle 1 : fond, icônes, titre, menu centré et barre de délai. Le style de sélection par image 9-slices pourra être ajouté si le rendu de base est validé.
+Version visuelle 2 : interface HUD cyberpunk sobre, menu décalé à gauche, sélection lumineuse, barre de délai et raccourcis clavier. Le squelette ASCII reste visible sur la droite, sans personnage ajouté.
