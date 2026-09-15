@@ -5,9 +5,11 @@ Thème GRUB sombre avec fond personnalisé, icônes et menu graphique pour un po
 ## Contenu
 
 - `theme.txt` : mise en page du menu graphique GRUB.
-- `background-grub-signal-skeleton.png` : squelette ASCII avec halo d’éclipse et signaux néon, utilisé par le thème actuel.
-- `menu_*.png` : neuf tranches du panneau verre fumé derrière le menu.
-- `select_*.png` : neuf tranches du halo de sélection de l’entrée active.
+- `background-grub-signal-hud.png` : fond SIGNAL LOST, squelette ASCII et panneau HUD intégré.
+- `background-grub-signal-skeleton.png` : ancien fond conservé comme source.
+- `hud_*.png` et `blackice_*.pf2` : sélection, progression, terminal et polices de LINK START utilisés par le thème squelette corrigé.
+- `menu_*.png` et `select_*.png` : anciens assets conservés, plus installés pour le thème squelette.
+- `SKELETON-CREDITS.md` et `OFL.txt` : provenance des assets et licence des polices.
 - `icons/fedora.png` : icône Fedora F en ASCII glitch sombre, dans le style de l’icône Windows.
 - `icons/windows.png` : icône Windows en ASCII glitch sur fond transparent.
 - `install.sh` : installation vérifiée et sauvegardée sur Fedora.
@@ -27,7 +29,7 @@ Le script sauvegarde la configuration actuelle, installe le thème avec des perm
 La configuration finale dans `/etc/default/grub` est :
 
 ```ini
-GRUB_GFXMODE=auto
+GRUB_GFXMODE=1920x1080,1600x900,1280x720,auto
 GRUB_THEME="/boot/grub2/themes/grub-theme/theme.txt"
 ```
 
@@ -35,7 +37,9 @@ Regénérer ensuite la configuration GRUB avec la commande adaptée à l’insta
 
 ## État
 
-Version visuelle 2 : interface HUD cyberpunk sobre, menu décalé à gauche, sélection lumineuse, barre de délai et raccourcis clavier. Le squelette ASCII reste visible sur la droite, sans personnage ajouté.
+Version visuelle 3, SIGNAL LOST : squelette ASCII et éclipse magenta à droite, panneau intégré au fond, polices JetBrains Mono / Blackice Term, ligne active en gras et cyan, icônes ASCII ramenées à 24 px et espacement de 48 px entre les entrées. Installation avec `sudo bash ./install.sh skeleton`.
+
+Le mode 16:9 est demandé pour préserver les proportions. Si aucun mode demandé n'est disponible, le firmware choisit le mode de secours `auto`. Les titres particulièrement longs, dont celui du secours Fedora, peuvent encore être tronqués. L'aperçu est simulé : la validation finale se fait au démarrage sur la machine.
 
 ## Deuxième thème : VOID TERMINAL
 
@@ -48,7 +52,7 @@ bash ./install.sh --check void-terminal
 bash ./install.sh --check skeleton
 ```
 
-Tests des deux variantes et des entrées invalides : `bash tests/check.sh` (sans droits administrateur).
+Tests des trois variantes et des entrées invalides : `bash tests/check.sh` (sans droits administrateur).
 
 Installer la nouvelle variante sur Fedora :
 

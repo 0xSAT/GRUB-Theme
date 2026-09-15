@@ -1,72 +1,68 @@
-# Dark glass GRUB theme for a Fedora / Windows dual-boot menu.
-# The menu entries themselves come from the machine's generated grub.cfg.
-
+# SIGNAL LOST: ASCII skeleton with Blackice typography and HUD assets.
+# Based on TomorrowX6/arch-grub; see SKELETON-CREDITS.md.
 title-text: ""
-desktop-image: "background-grub-signal-skeleton.png"
-desktop-image-scale-method: "crop"
-desktop-color: "#080B12"
-terminal-font: "Unifont Regular 16"
-terminal-left: "0"
-terminal-top: "0"
-terminal-width: "100%"
-terminal-height: "100%"
+desktop-image: "background-grub-signal-hud.png"
+desktop-image-scale-method: "stretch"
+desktop-color: "#020406"
+terminal-font: "Blackice Term Regular 14"
+terminal-box: "hud_terminal_box_*.png"
+terminal-left: "10%"
+terminal-top: "10%"
+terminal-width: "80%"
+terminal-height: "80%"
 terminal-border: "0"
 
+# The panel header ends at 38% in the wallpaper.
 + boot_menu {
-    left = 10%
-    top = 31%
-    width = 58%
-    height = 43%
-
-    item_font = "Unifont Regular 14"
-    item_color = "#6E86A0"
-    selected_item_font = "Unifont Regular 14"
+    left = 9%
+    top = 41%
+    width = 41%
+    height = 30%
+    item_font = "Blackice Term Regular 16"
+    selected_item_font = "Blackice Term Bold 16"
+    item_color = "#8CA5B9"
     selected_item_color = "#DEF0FF"
-    selected_item_pixmap_style = "select_*.png"
-    icon_width = 52
-    icon_height = 52
+    icon_width = 24
+    icon_height = 24
     item_icon_space = 16
-    item_height = 68
+    item_height = 44
     item_padding = 12
-    item_spacing = 8
-    menu_pixmap_style = "menu_*.png"
-}
-
-+ label {
-    left = 10%
-    top = 21%
-    width = 58%
-    align = "left"
-    color = "#8CE1FF"
-    text = "SYSTEM SELECT // DUAL BOOT"
+    item_spacing = 4
+    selected_item_pixmap_style = "hud_select_*.png"
+    scrollbar = true
+    scrollbar_width = 6
+    scrollbar_thumb = "hud_sb_thumb_*.png"
+    scrollbar_frame = "hud_sb_frame_*.png"
 }
 
 + progress_bar {
     id = "__timeout__"
-    left = 10%
+    left = 9%
     top = 82%
-    width = 58%
-    height = 6
-    fg_color = "#23AAFF"
-    bg_color = "#142639"
-    border_color = "#263044"
+    width = 41%
+    height = 14
+    show_text = false
+    bar_style = "hud_progress_frame_*.png"
+    highlight_style = "hud_progress_hl_*.png"
 }
 
 + label {
     id = "__timeout__"
-    left = 10%
-    top = 85%
-    width = 58%
-    align = "left"
-    color = "#6E86A0"
-    text = "@TIMEOUT_NOTIFICATION_LONG@"
+    left = 9%
+    top = 86%
+    width = 41%
+    align = "center"
+    font = "Blackice Term Regular 14"
+    color = "#23AAFF"
+    text = "AUTO-EXEC IN %d SEC :: PRESS ANY KEY TO ABORT"
 }
 
 + label {
-    left = 10%
-    top = 91%
-    width = 58%
-    align = "left"
-    color = "#4A5E78"
-    text = "[↑/↓] SELECT   [ENTER] BOOT   [E] EDIT   [C] CONSOLE"
+    left = 0
+    top = 94%
+    width = 100%
+    align = "center"
+    font = "Blackice Term Regular 12"
+    color = "#8CA5B9"
+    text = "[↑/↓] SELECT      [ENTER] EXECUTE      [E] EDIT      [C] CONSOLE"
 }

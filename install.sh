@@ -22,10 +22,17 @@ case "$variant" in
     skeleton)
         source_dir=$repo
         theme=/boot/grub2/themes/grub-theme
-        background=background-grub-signal-skeleton.png
-        sprites=()
+        background=background-grub-signal-hud.png
+        gfxmode=1920x1080,1600x900,1280x720,auto
+        sprites=(hud_select_w.png hud_select_c.png hud_select_e.png
+            hud_progress_frame_w.png hud_progress_frame_c.png hud_progress_frame_e.png
+            hud_progress_hl_w.png hud_progress_hl_c.png hud_progress_hl_e.png
+            hud_sb_frame_c.png hud_sb_thumb_n.png hud_sb_thumb_c.png hud_sb_thumb_s.png
+            blackice_bold_16.pf2 blackice_regular_12.pf2
+            blackice_regular_14.pf2 blackice_regular_16.pf2
+            SKELETON-CREDITS.md OFL.txt)
         for panel in "${panels[@]}"; do
-            sprites+=("menu_${panel}.png" "select_${panel}.png")
+            sprites+=("hud_terminal_box_${panel}.png")
         done
         ;;
     void-terminal)

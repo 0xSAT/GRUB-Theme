@@ -12,14 +12,14 @@ if bash "$repo/install.sh" --check ../invalid; then
     exit 1
 fi
 fixture="$(mktemp -d)"
-trap 'rm -f -- "$fixture/install.sh" "$fixture/theme.txt" "$fixture/background-grub-signal-skeleton.png"; rmdir -- "$fixture"' EXIT
+trap 'rm -f -- "$fixture/install.sh" "$fixture/theme.txt" "$fixture/background-grub-signal-hud.png"; rmdir -- "$fixture"' EXIT
 cp -- "$repo/install.sh" "$fixture/install.sh"
 if bash "$fixture/install.sh" --check skeleton; then
     printf 'FAIL: missing theme accepted\n' >&2
     exit 1
 fi
-printf 'desktop-image: "background-grub-signal-skeleton.png"\n' > "$fixture/theme.txt"
-printf 'not a PNG\n' > "$fixture/background-grub-signal-skeleton.png"
+printf 'desktop-image: "background-grub-signal-hud.png"\n' > "$fixture/theme.txt"
+printf 'not a PNG\n' > "$fixture/background-grub-signal-hud.png"
 if bash "$fixture/install.sh" --check skeleton; then
     printf 'FAIL: invalid PNG accepted\n' >&2
     exit 1
