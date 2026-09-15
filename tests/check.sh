@@ -5,6 +5,7 @@ repo="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
 bash -n "$repo/install.sh"
 bash "$repo/install.sh" --check skeleton
 bash "$repo/install.sh" --check void-terminal
+bash "$repo/install.sh" --check link-start
 bash "$repo/install.sh" --check
 if bash "$repo/install.sh" --check ../invalid; then
     printf 'FAIL: unknown theme accepted\n' >&2
@@ -23,4 +24,4 @@ if bash "$fixture/install.sh" --check skeleton; then
     printf 'FAIL: invalid PNG accepted\n' >&2
     exit 1
 fi
-printf 'PASS: both themes, default choice and invalid inputs\n'
+printf 'PASS: all themes, default choice and invalid inputs\n'

@@ -67,3 +67,20 @@ Sans argument, l'installateur choisit toujours `skeleton`. VOID TERMINAL s'insta
 Le contrôle `--check` vérifie les fichiers, leur type PNG et la référence au fond ; il ne simule pas GRUB. Les longues entrées peuvent encore être tronquées selon la résolution disponible. La police utilisée est `Unifont Regular 16`, déjà utilisée par le thème d'origine.
 
 Inspiration de composition : [TomorrowX6/arch-grub](https://github.com/TomorrowX6/arch-grub), consulté le 15 septembre 2026. Configuration rédigée pour cette variante ; aucune image ni police du dépôt de référence n'est distribuée ici. Fond original généré avec l'outil image intégré, direction : « éclipse bleu glace à droite, terminal spatial abandonné, gauche sombre dégagée, sans texte ni personnage ».
+
+## LINK START : adaptation directe du thème de TomorrowX6
+
+Cette variante reprend les fichiers du thème `blackice` : mise en page, polices PF2,
+sélection, cadres, progression, défilement et icônes Fedora/Windows.
+Le fond reprend le décor HUD avec une ville cyberpunk à la place du personnage.
+Les crédits et la licence des polices sont dans `themes/link-start/CREDITS.md` et `OFL.txt`.
+
+```bash
+bash ./install.sh --check link-start
+sudo bash ./install.sh link-start
+```
+
+Installation dans `/boot/grub2/themes/link-start`. Cette variante demande les modes
+1920×1080, 1600×900, 1280×720, puis `auto` en dernier recours. Si le firmware ne
+propose aucun de ces modes, le fond 16:9 peut être déformé dans le mode de secours.
+Les autres variantes et leurs fichiers restent disponibles.

@@ -10,11 +10,13 @@ die() { printf '[ERROR] %s\n' "$*" >&2; exit 1; }
 warn() { printf '[WARN] %s\n' "$*" >&2; }
 
 check_only=false
+icons_dir="$repo/icons"
+gfxmode=auto
 if [[ ${1:-} == --check ]]; then
     check_only=true
     shift
 fi
-[[ $# -le 1 ]] || die 'Usage : bash ./install.sh [--check] [skeleton|void-terminal]'
+[[ $# -le 1 ]] || die 'Usage : bash ./install.sh [--check] [skeleton|void-terminal|link-start]'
 variant=${1:-skeleton}
 case "$variant" in
     skeleton)
@@ -32,7 +34,24 @@ case "$variant" in
         background=background.png
         sprites=(select_w.png select_c.png select_e.png)
         ;;
-    *) die "Thème inconnu : $variant (skeleton ou void-terminal)" ;;
+    link-start)
+        source_dir="$repo/themes/link-start"
+        icons_dir="$source_dir/icons"
+        theme=/boot/grub2/themes/link-start
+        background=background.png
+        gfxmode=1920x1080,1600x900,1280x720,auto
+        sprites=(select_w.png select_c.png select_e.png
+            progress_frame_w.png progress_frame_c.png progress_frame_e.png
+            progress_hl_w.png progress_hl_c.png progress_hl_e.png
+            sb_frame_c.png sb_thumb_n.png sb_thumb_c.png sb_thumb_s.png
+            blackice_bold_16.pf2 blackice_regular_12.pf2
+            blackice_regular_14.pf2 blackice_regular_16.pf2
+            CREDITS.md OFL.txt)
+        for panel in "${panels[@]}"; do
+            sprites+=("terminal_box_${panel}.png")
+        done
+        ;;
+    *) die "Thème inconnu : $variant (skeleton, void-terminal ou link-start)" ;;
 esac
 assets=(theme.txt "$background" "${sprites[@]}")
 
@@ -43,15 +62,18 @@ for asset in "${assets[@]}"; do
     [[ -f $path && ! -L $path ]] || die "Fichier manquant ou lien symbolique : $path"
     if [[ $asset == *.png ]]; then
         [[ "$(file -b --mime-type "$path")" == image/png ]] || die "PNG invalide : $path"
+    elif [[ $asset == *.pf2 ]]; then
+        [[ "$(od -An -tx1 -N12 "$path" | tr -d ' \n')" == 46494c450000000450464632 ]] \
+            || die "Police PF2 invalide : $path"
     fi
 done
 
-for path in "$repo/icons/fedora.png" "$repo/icons/windows.png"; do
+for path in "$icons_dir/fedora.png" "$icons_dir/windows.png"; do
     [[ -f $path && ! -L $path ]] || die "Fichier manquant ou lien symbolique : $path"
     [[ "$(file -b --mime-type "$path")" == image/png ]] || die "PNG invalide : $path"
 done
 
-extra="$(find "$repo/icons" -maxdepth 1 -type f ! -name fedora.png ! -name windows.png -print -quit)"
+extra="$(find "$icons_dir" -maxdepth 1 -type f ! -name fedora.png ! -name windows.png -print -quit)"
 [[ -z $extra ]] || die "Icône supplémentaire trouvée : $extra"
 
 grep -Fxq "desktop-image: \"$background\"" "$source_dir/theme.txt" \
@@ -61,7 +83,7 @@ if "$check_only"; then
     exit 0
 fi
 
-[[ $EUID -eq 0 ]] || die 'Lance avec : sudo bash ./install.sh [skeleton|void-terminal]'
+[[ $EUID -eq 0 ]] || die 'Lance avec : sudo bash ./install.sh [skeleton|void-terminal|link-start]'
 command -v grub2-mkconfig >/dev/null || die 'grub2-mkconfig absent : installe grub2-tools'
 command -v grub2-script-check >/dev/null || die 'grub2-script-check absent : installe grub2-tools'
 [[ -f $defaults ]] || die "$defaults introuvable"
@@ -78,7 +100,7 @@ install -d -o root -g root -m 0755 "$stage/icons"
 for asset in "${assets[@]}"; do
     install -o root -g root -m 0644 "$source_dir/$asset" "$stage/"
 done
-install -o root -g root -m 0644 "$repo/icons/fedora.png" "$repo/icons/windows.png" "$stage/icons/"
+install -o root -g root -m 0644 "$icons_dir/fedora.png" "$icons_dir/windows.png" "$stage/icons/"
 
 [[ ! -L $theme ]] || die "Refus de remplacer le lien symbolique : $theme"
 [[ ! -e $theme ]] || mv -- "$theme" "$backup/theme"
@@ -90,7 +112,7 @@ sed -i -E \
     -e '/^[[:space:]]*GRUB_GFXMODE=/d' \
     -e 's/^[[:space:]]*GRUB_TERMINAL_OUTPUT=/#&/' \
     "$defaults"
-printf '\nGRUB_GFXMODE=auto\nGRUB_THEME="%s/theme.txt"\n' "$theme" >> "$defaults"
+printf '\nGRUB_GFXMODE=%s\nGRUB_THEME="%s/theme.txt"\n' "$gfxmode" "$theme" >> "$defaults"
 chown root:root "$defaults"
 chmod 0644 "$defaults"
 
