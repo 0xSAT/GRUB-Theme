@@ -64,7 +64,6 @@ fi
 [[ $EUID -eq 0 ]] || die 'Lance avec : sudo bash ./install.sh [skeleton|void-terminal|link-start]'
 command -v grub2-mkconfig >/dev/null || die 'grub2-mkconfig absent : installe grub2-tools'
 command -v grub2-script-check >/dev/null || die 'grub2-script-check absent : installe grub2-tools'
-command -v grub2-editenv >/dev/null || die 'grub2-editenv absent : installe grub2-tools'
 [[ -f $defaults ]] || die "$defaults introuvable"
 install -d -o root -g root -m 0755 /var/backups
 backup="$(mktemp -d /var/backups/grub-theme-$(date +%Y%m%d-%H%M%S)-XXXXXX)"
@@ -72,7 +71,6 @@ backup="$(mktemp -d /var/backups/grub-theme-$(date +%Y%m%d-%H%M%S)-XXXXXX)"
 install -d -o root -g root -m 0755 /boot/grub2/themes "$backup"
 install -o root -g root -m 0600 "$defaults" "$backup/grub-defaults"
 [[ ! -f /boot/grub2/grub.cfg ]] || install -o root -g root -m 0600 /boot/grub2/grub.cfg "$backup/grub.cfg"
-[[ ! -f /boot/grub2/grubenv ]] || install -o root -g root -m 0600 /boot/grub2/grubenv "$backup/grubenv"
 
 stage="$(mktemp -d /boot/grub2/themes/.grub-theme.XXXXXX)"
 trap '[[ -z "${stage}" ]] || rm -rf -- "${stage}"' EXIT
@@ -91,15 +89,11 @@ stage=''
 sed -i -E \
     -e '/^[[:space:]]*GRUB_THEME=/d' \
     -e '/^[[:space:]]*GRUB_GFXMODE=/d' \
-    -e '/^[[:space:]]*GRUB_TIMEOUT=/d' \
-    -e '/^[[:space:]]*GRUB_TIMEOUT_STYLE=/d' \
     -e 's/^[[:space:]]*GRUB_TERMINAL_OUTPUT=/#&/' \
     "$defaults"
-printf '\nGRUB_GFXMODE=%s\nGRUB_THEME="%s/theme.txt"\nGRUB_TIMEOUT_STYLE=menu\nGRUB_TIMEOUT=15\n' \
-    "$gfxmode" "$theme" >> "$defaults"
+printf '\nGRUB_GFXMODE=%s\nGRUB_THEME="%s/theme.txt"\n' "$gfxmode" "$theme" >> "$defaults"
 chown root:root "$defaults"
 chmod 0644 "$defaults"
-grub2-editenv - unset menu_auto_hide
 
 if [[ -d /sys/firmware/efi ]]; then
     grub_cfg=/etc/grub2-efi.cfg
@@ -126,4 +120,4 @@ has_class() {
 has_class fedora || warn 'Classe fedora absente : son icône pourrait ne pas apparaître'
 has_class windows || warn 'Classe windows absente : son icône pourrait ne pas apparaître'
 
-printf '[INFO] Thème installé. Sauvegarde : %s\n[INFO] Menu GRUB : 15 secondes.\n[INFO] Aucun redémarrage effectué.\n' "$backup"
+printf '[INFO] Thème installé. Sauvegarde : %s\n[INFO] Aucun redémarrage effectué.\n' "$backup"
