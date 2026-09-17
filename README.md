@@ -2,17 +2,28 @@
 
 Thème GRUB sombre avec fond personnalisé, icônes et menu graphique pour un poste Fedora / Windows en double démarrage.
 
-## Contenu
+## Organisation
 
-- `theme.txt` : mise en page du menu graphique GRUB.
-- `background-grub-signal-hud.png` : fond SIGNAL LOST, squelette ASCII et panneau HUD intégré.
-- `background-grub-signal-skeleton.png` : ancien fond conservé comme source.
-- `hud_*.png` et `blackice_*.pf2` : sélection, progression, terminal et polices de LINK START utilisés par le thème squelette corrigé.
-- `menu_*.png` et `select_*.png` : anciens assets conservés, plus installés pour le thème squelette.
-- `SKELETON-CREDITS.md` et `OFL.txt` : provenance des assets et licence des polices.
-- `icons/fedora.png` : icône Fedora F en ASCII glitch sombre, dans le style de l’icône Windows.
-- `icons/windows.png` : icône Windows en ASCII glitch sur fond transparent.
-- `install.sh` : installation vérifiée et sauvegardée sur Fedora.
+Chaque variante est autonome et contient son fond, sa configuration, ses icônes et ses assets :
+
+```text
+themes/
+├── skeleton/
+│   ├── theme.txt
+│   ├── background.png
+│   ├── icons/
+│   └── archive/        # anciens assets, non installés
+├── void-terminal/
+│   ├── theme.txt
+│   ├── background.png
+│   └── icons/
+└── link-start/
+    ├── theme.txt
+    ├── background.png
+    └── icons/
+```
+
+La racine contient seulement l’installateur, les tests et la documentation.
 
 Le thème ne modifie pas les entrées de démarrage. Fedora et Windows doivent déjà être détectés et présents dans le `grub.cfg` généré par la machine. GRUB associe les icônes aux classes des entrées de menu.
 
@@ -30,7 +41,7 @@ La configuration finale dans `/etc/default/grub` est :
 
 ```ini
 GRUB_GFXMODE=1920x1080,1600x900,1280x720,auto
-GRUB_THEME="/boot/grub2/themes/grub-theme/theme.txt"
+GRUB_THEME="/boot/grub2/themes/skeleton/theme.txt"
 ```
 
 Regénérer ensuite la configuration GRUB avec la commande adaptée à l’installation Fedora utilisée. L’icône Fedora est prévue pour les entrées portant la classe `fedora`, et l’icône Windows pour la classe `windows`. Les autres entrées n’ont plus d’icône dédiée dans ce thème.
@@ -66,7 +77,7 @@ Revenir au thème squelette :
 sudo bash ./install.sh skeleton
 ```
 
-Sans argument, l'installateur choisit toujours `skeleton`. VOID TERMINAL s'installe dans `/boot/grub2/themes/void-terminal`, avec sa propre référence `GRUB_THEME`. Chaque installation sauvegarde la configuration précédente ; aucun redémarrage automatique.
+Sans argument, l'installateur choisit toujours `skeleton`. Chaque variante s'installe dans `/boot/grub2/themes/<nom>`, avec sa propre référence `GRUB_THEME`. Chaque installation sauvegarde la configuration précédente ; aucun redémarrage automatique.
 
 Le contrôle `--check` vérifie les fichiers, leur type PNG et la référence au fond ; il ne simule pas GRUB. Les longues entrées peuvent encore être tronquées selon la résolution disponible. La police utilisée est `Unifont Regular 16`, déjà utilisée par le thème d'origine.
 

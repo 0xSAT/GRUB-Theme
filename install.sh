@@ -4,13 +4,11 @@ umask 022
 
 repo="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 defaults=/etc/default/grub
-panels=(nw n ne w c e sw s se)
 
 die() { printf '[ERROR] %s\n' "$*" >&2; exit 1; }
 warn() { printf '[WARN] %s\n' "$*" >&2; }
 
 check_only=false
-icons_dir="$repo/icons"
 gfxmode=auto
 if [[ ${1:-} == --check ]]; then
     check_only=true
@@ -19,66 +17,39 @@ fi
 [[ $# -le 1 ]] || die 'Usage : bash ./install.sh [--check] [skeleton|void-terminal|link-start]'
 variant=${1:-skeleton}
 case "$variant" in
-    skeleton)
-        source_dir=$repo
-        theme=/boot/grub2/themes/grub-theme
-        background=background-grub-signal-hud.png
+    skeleton|link-start)
         gfxmode=1920x1080,1600x900,1280x720,auto
-        sprites=(hud_select_w.png hud_select_c.png hud_select_e.png
-            hud_progress_frame_w.png hud_progress_frame_c.png hud_progress_frame_e.png
-            hud_progress_hl_w.png hud_progress_hl_c.png hud_progress_hl_e.png
-            hud_sb_frame_c.png hud_sb_thumb_n.png hud_sb_thumb_c.png hud_sb_thumb_s.png
-            blackice_bold_16.pf2 blackice_regular_12.pf2
-            blackice_regular_14.pf2 blackice_regular_16.pf2
-            SKELETON-CREDITS.md OFL.txt)
-        for panel in "${panels[@]}"; do
-            sprites+=("hud_terminal_box_${panel}.png")
-        done
         ;;
     void-terminal)
-        source_dir="$repo/themes/void-terminal"
-        theme=/boot/grub2/themes/void-terminal
-        background=background.png
-        sprites=(select_w.png select_c.png select_e.png)
-        ;;
-    link-start)
-        source_dir="$repo/themes/link-start"
-        icons_dir="$source_dir/icons"
-        theme=/boot/grub2/themes/link-start
-        background=background.png
-        gfxmode=1920x1080,1600x900,1280x720,auto
-        sprites=(select_w.png select_c.png select_e.png
-            progress_frame_w.png progress_frame_c.png progress_frame_e.png
-            progress_hl_w.png progress_hl_c.png progress_hl_e.png
-            sb_frame_c.png sb_thumb_n.png sb_thumb_c.png sb_thumb_s.png
-            blackice_bold_16.pf2 blackice_regular_12.pf2
-            blackice_regular_14.pf2 blackice_regular_16.pf2
-            CREDITS.md OFL.txt)
-        for panel in "${panels[@]}"; do
-            sprites+=("terminal_box_${panel}.png")
-        done
         ;;
     *) die "Thème inconnu : $variant (skeleton, void-terminal ou link-start)" ;;
 esac
-assets=(theme.txt "$background" "${sprites[@]}")
+source_dir="$repo/themes/$variant"
+icons_dir="$source_dir/icons"
+theme="/boot/grub2/themes/$variant"
+background=background.png
 
 command -v file >/dev/null || die 'file absent : installe le paquet file'
 
-for asset in "${assets[@]}"; do
-    path="$source_dir/$asset"
+for path in \
+    "$source_dir/theme.txt" \
+    "$source_dir/$background" \
+    "$icons_dir/fedora.png" \
+    "$icons_dir/windows.png"; do
     [[ -f $path && ! -L $path ]] || die "Fichier manquant ou lien symbolique : $path"
-    if [[ $asset == *.png ]]; then
-        [[ "$(file -b --mime-type "$path")" == image/png ]] || die "PNG invalide : $path"
-    elif [[ $asset == *.pf2 ]]; then
-        [[ "$(od -An -tx1 -N12 "$path" | tr -d ' \n')" == 46494c450000000450464632 ]] \
-            || die "Police PF2 invalide : $path"
-    fi
 done
 
-for path in "$icons_dir/fedora.png" "$icons_dir/windows.png"; do
-    [[ -f $path && ! -L $path ]] || die "Fichier manquant ou lien symbolique : $path"
+link="$(find "$source_dir" -type l -print -quit)"
+[[ -z $link ]] || die "Lien symbolique interdit : $link"
+
+while IFS= read -r -d '' path; do
     [[ "$(file -b --mime-type "$path")" == image/png ]] || die "PNG invalide : $path"
-done
+done < <(find "$source_dir" -type f -name '*.png' -print0)
+
+while IFS= read -r -d '' path; do
+    [[ "$(od -An -tx1 -N12 "$path" | tr -d ' \n')" == 46494c450000000450464632 ]] \
+        || die "Police PF2 invalide : $path"
+done < <(find "$source_dir" -type f -name '*.pf2' -print0)
 
 extra="$(find "$icons_dir" -maxdepth 1 -type f ! -name fedora.png ! -name windows.png -print -quit)"
 [[ -z $extra ]] || die "Icône supplémentaire trouvée : $extra"
@@ -104,10 +75,11 @@ install -o root -g root -m 0600 "$defaults" "$backup/grub-defaults"
 stage="$(mktemp -d /boot/grub2/themes/.grub-theme.XXXXXX)"
 trap '[[ -z "${stage}" ]] || rm -rf -- "${stage}"' EXIT
 install -d -o root -g root -m 0755 "$stage/icons"
-for asset in "${assets[@]}"; do
-    install -o root -g root -m 0644 "$source_dir/$asset" "$stage/"
-done
-install -o root -g root -m 0644 "$icons_dir/fedora.png" "$icons_dir/windows.png" "$stage/icons/"
+while IFS= read -r -d '' path; do
+    relative=${path#"$source_dir/"}
+    [[ $relative == archive/* ]] && continue
+    install -D -o root -g root -m 0644 "$path" "$stage/$relative"
+done < <(find "$source_dir" -type f -print0)
 
 [[ ! -L $theme ]] || die "Refus de remplacer le lien symbolique : $theme"
 [[ ! -e $theme ]] || mv -- "$theme" "$backup/theme"
@@ -134,10 +106,9 @@ fi
 grub2-mkconfig -o "$grub_cfg"
 grub2-script-check /boot/grub2/grub.cfg
 
-for asset in "${assets[@]}" icons/fedora.png icons/windows.png; do
-    path="$theme/$asset"
+while IFS= read -r -d '' path; do
     [[ "$(stat -c '%U:%G:%a' "$path")" == root:root:644 ]] || die "Permissions incorrectes : $path"
-done
+done < <(find "$theme" -type f -print0)
 
 has_class() {
     local class=$1

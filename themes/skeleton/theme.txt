@@ -1,7 +1,7 @@
 # SIGNAL LOST: ASCII skeleton with Blackice typography and HUD assets.
-# Based on TomorrowX6/arch-grub; see SKELETON-CREDITS.md.
+# Based on TomorrowX6/arch-grub; see CREDITS.md.
 title-text: ""
-desktop-image: "background-grub-signal-hud.png"
+desktop-image: "background.png"
 desktop-image-scale-method: "stretch"
 desktop-color: "#020406"
 terminal-font: "Blackice Term Regular 14"
