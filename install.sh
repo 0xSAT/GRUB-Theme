@@ -89,9 +89,11 @@ stage=''
 sed -i -E \
     -e '/^[[:space:]]*GRUB_THEME=/d' \
     -e '/^[[:space:]]*GRUB_GFXMODE=/d' \
+    -e '/^[[:space:]]*GRUB_TIMEOUT=/d' \
     -e 's/^[[:space:]]*GRUB_TERMINAL_OUTPUT=/#&/' \
     "$defaults"
-printf '\nGRUB_GFXMODE=%s\nGRUB_THEME="%s/theme.txt"\n' "$gfxmode" "$theme" >> "$defaults"
+printf '\nGRUB_GFXMODE=%s\nGRUB_THEME="%s/theme.txt"\nGRUB_TIMEOUT=15\n' \
+    "$gfxmode" "$theme" >> "$defaults"
 chown root:root "$defaults"
 chmod 0644 "$defaults"
 
