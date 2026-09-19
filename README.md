@@ -1,6 +1,6 @@
-# GRUB Theme
+# GRUB Themes
 
-Thème GRUB sombre avec fond personnalisé, icônes et menu graphique pour un poste Fedora / Windows en double démarrage.
+Collection de thèmes GRUB avec icônes et menus graphiques pour un poste Fedora / Windows en double démarrage.
 
 ## Organisation
 
@@ -17,7 +17,11 @@ themes/
 │   ├── theme.txt
 │   ├── background.png
 │   └── icons/
-└── link-start/
+├── link-start/
+│   ├── theme.txt
+│   ├── background.png
+│   └── icons/
+└── sleek-light/
     ├── theme.txt
     ├── background.png
     └── icons/
@@ -63,7 +67,7 @@ bash ./install.sh --check void-terminal
 bash ./install.sh --check skeleton
 ```
 
-Tests des trois variantes et des entrées invalides : `bash tests/check.sh` (sans droits administrateur).
+Tests des quatre variantes et des entrées invalides : `bash tests/check.sh` (sans droits administrateur).
 
 Installer la nouvelle variante sur Fedora :
 
@@ -99,3 +103,15 @@ Installation dans `/boot/grub2/themes/link-start`. Cette variante demande les mo
 1920×1080, 1600×900, 1280×720, puis `auto` en dernier recours. Si le firmware ne
 propose aucun de ces modes, le fond 16:9 peut être déformé dans le mode de secours.
 Les autres variantes et leurs fichiers restent disponibles.
+
+## SLEEK LIGHT
+
+Adaptation de la variante claire de
+[sandesh236/sleek--themes](https://github.com/sandesh236/sleek--themes/tree/master/Sleek%20theme-light) :
+fond gris clair, polices Poppins, carte blanche, sélection bleue et icônes Fedora/Windows.
+Les crédits et licences sont inclus dans `themes/sleek-light/`.
+
+```bash
+bash ./install.sh --check sleek-light
+sudo bash ./install.sh sleek-light
+```

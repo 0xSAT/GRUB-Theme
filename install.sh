@@ -14,15 +14,15 @@ if [[ ${1:-} == --check ]]; then
     check_only=true
     shift
 fi
-[[ $# -le 1 ]] || die 'Usage : bash ./install.sh [--check] [skeleton|void-terminal|link-start]'
+[[ $# -le 1 ]] || die 'Usage : bash ./install.sh [--check] [skeleton|void-terminal|link-start|sleek-light]'
 variant=${1:-skeleton}
 case "$variant" in
-    skeleton|link-start)
+    skeleton|link-start|sleek-light)
         gfxmode=1920x1080,1600x900,1280x720,auto
         ;;
     void-terminal)
         ;;
-    *) die "Thème inconnu : $variant (skeleton, void-terminal ou link-start)" ;;
+    *) die "Thème inconnu : $variant (skeleton, void-terminal, link-start ou sleek-light)" ;;
 esac
 source_dir="$repo/themes/$variant"
 icons_dir="$source_dir/icons"
@@ -61,7 +61,7 @@ if "$check_only"; then
     exit 0
 fi
 
-[[ $EUID -eq 0 ]] || die 'Lance avec : sudo bash ./install.sh [skeleton|void-terminal|link-start]'
+[[ $EUID -eq 0 ]] || die 'Lance avec : sudo bash ./install.sh [skeleton|void-terminal|link-start|sleek-light]'
 command -v grub2-mkconfig >/dev/null || die 'grub2-mkconfig absent : installe grub2-tools'
 command -v grub2-script-check >/dev/null || die 'grub2-script-check absent : installe grub2-tools'
 [[ -f $defaults ]] || die "$defaults introuvable"

@@ -6,6 +6,7 @@ bash -n "$repo/install.sh"
 bash "$repo/install.sh" --check skeleton
 bash "$repo/install.sh" --check void-terminal
 bash "$repo/install.sh" --check link-start
+bash "$repo/install.sh" --check sleek-light
 bash "$repo/install.sh" --check
 if bash "$repo/install.sh" --check ../invalid; then
     printf 'FAIL: unknown theme accepted\n' >&2
